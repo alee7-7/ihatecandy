@@ -94,7 +94,7 @@ function drawCounter() {
   // Set text properties
   textFont(customFont); // Use Tiny5 font
   textAlign(CENTER, TOP);
-  textSize(32);
+  textSize(300);
   fill(255); // White text
   // stroke(0); // Black outline
   // strokeWeight(4);

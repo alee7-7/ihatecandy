@@ -35,7 +35,6 @@ a{
 #endimg {
   width: 70%;
   display: block;
-  max-width: 100%;
-  margin: 0 auto;
-/*   margin: 0 auto 20% auto; */
+/*   max-width: 100%; */
+  margin: -10% auto 10% auto;
 }
