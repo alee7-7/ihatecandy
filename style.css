@@ -1,0 +1,38 @@
+html, body {
+  margin: 0;
+  padding: 0;
+  background-color: black;
+}
+
+.tiny5-regular {
+  font-family: "Tiny5", sans-serif;
+  font-weight: 300;
+  font-style: normal;
+}
+
+p{
+  text-align: center;
+  color: yellow;
+  font-size: 250%;
+  padding: 5% 15% 5% 15%;
+}
+
+a{
+  text-align: center;
+  color: black;
+  font-size: 250%;
+  padding: 5%;
+  background-color: yellow;
+  text-decoration: none;
+/*   display: block; */
+}
+
+#button{
+  text-align: center;
+}
+
+img{
+  width: 70%;
+  display: block;
+  margin: -10% auto 10% auto;
+}
