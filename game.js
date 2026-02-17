@@ -23,8 +23,8 @@ const BUG_MOVE_DURATION_MIN = 3;  // Minimum seconds to reach target (slow Space
 const BUG_MOVE_DURATION_MAX = 8; // Maximum seconds to reach target (slow Space Invaders style)
 
 // Bug size range (in pixels)
-const BUG_SIZE_MIN = 150;
-const BUG_SIZE_MAX = 250;
+const BUG_SIZE_MIN = 800;
+const BUG_SIZE_MAX = 1000;
 
 // Bug fade-in speed
 const FADE_SPEED = 1; // How fast bugs fade in (higher = faster)
