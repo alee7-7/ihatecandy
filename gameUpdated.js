@@ -20,8 +20,8 @@ const SPAWN_DELAY_MAX = 2000;
 const BUG_MOVE_DURATION_MIN = 3;
 const BUG_MOVE_DURATION_MAX = 8;
 
-const BUG_SIZE_MIN = 60;
-const BUG_SIZE_MAX = 100;
+const BUG_SIZE_MIN = 30;
+const BUG_SIZE_MAX = 60;
 
 const FADE_SPEED = 3;
 
@@ -107,7 +107,7 @@ function drawCounter() {
   push();
   textFont(customFont);
   textAlign(CENTER, TOP);
-  textSize(40);
+  textSize(20);
   fill(255);
   text(`${defeatedCount}/${totalBugs}`, width / 2, 20);
   pop();
