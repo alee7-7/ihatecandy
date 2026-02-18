@@ -15,8 +15,8 @@ const BUG_MOVE_DURATION_MIN = 3;
 const BUG_MOVE_DURATION_MAX = 8;
 
 // Bug size as a fraction of screen width (0.08 = 8% of screen width)
-const BUG_SIZE_MIN_FRAC = 0.08;
-const BUG_SIZE_MAX_FRAC = 0.15;
+const BUG_SIZE_MIN_FRAC = 0.30;
+const BUG_SIZE_MAX_FRAC = 0.50;
 
 const FADE_SPEED = 3;
 const MARGIN_TOP = 0;
@@ -92,7 +92,7 @@ function drawCounter() {
   push();
   textFont(customFont);
   textAlign(CENTER, TOP);
-  textSize(width * 0.06); // 6% of screen width — scales to any device
+  textSize(width * 0.20); // 6% of screen width — scales to any device
   fill(255);
   text(`${defeatedCount}/${totalBugs}`, width / 2, 20);
   pop();
