@@ -1,5 +1,5 @@
-let video;
-let videoReady = false; // Track if camera loaded successfully
+let nativeVideo;   // Native HTML video element
+let videoReady = false;
 let bugImages = [];
 let bugs = [];
 let totalBugs = 12;
@@ -14,35 +14,28 @@ let visibleHeight = 0;
 
 // ===== CUSTOMIZABLE SETTINGS =====
 
-// Bug spawn timing (in milliseconds)
 const SPAWN_DELAY_MIN = 500;
 const SPAWN_DELAY_MAX = 2000;
 
-// Bug movement duration (in seconds)
 const BUG_MOVE_DURATION_MIN = 3;
 const BUG_MOVE_DURATION_MAX = 8;
 
-// Bug size range (in pixels) — reduced for mobile screens
 const BUG_SIZE_MIN = 80;
 const BUG_SIZE_MAX = 150;
 
-// Bug fade-in speed
 const FADE_SPEED = 3;
 
-// Bug spawn margins
 const MARGIN_TOP = 0;
 const MARGIN_BOTTOM = 0;
 const MARGIN_LEFT = 0;
 const MARGIN_RIGHT = 0;
 
-// Target position margins
 const TARGET_MARGIN = 50;
 
 // ===== END CUSTOMIZABLE SETTINGS =====
 
 function preload() {
   customFont = loadFont('Tiny5-Regular.ttf');
-
   for (let i = 0; i < totalBugs; i++) {
     bugImages[i] = loadImage(`bug${i + 1}.png`);
   }
@@ -58,25 +51,38 @@ function setup() {
   cnv.style('margin', '0');
   cnv.style('padding', '0');
 
-  // Setup camera with success and error callbacks
-  video = createCapture(
-    {
-      video: { facingMode: { ideal: "environment" } },
-      audio: false
-    },
-    () => {
-      // Camera loaded successfully
-      videoReady = true;
-    },
-    (err) => {
-      // Camera failed — fall back gracefully to black background
-      console.warn("Camera not available:", err);
-      videoReady = false;
-      video = null;
-    }
-  );
+  // Create a native HTML video element — more reliable than p5's createCapture on iOS/Android
+  nativeVideo = document.createElement('video');
+  nativeVideo.setAttribute('playsinline', ''); // CRITICAL for iOS — prevents fullscreen takeover
+  nativeVideo.setAttribute('autoplay', '');
+  nativeVideo.setAttribute('muted', '');
+  nativeVideo.style.display = 'none';
+  document.body.appendChild(nativeVideo);
 
-  if (video) video.hide();
+  // Request camera access
+  if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+    navigator.mediaDevices.getUserMedia({
+      video: {
+        facingMode: { ideal: 'environment' }, // Prefer rear camera
+        width: { ideal: 1280 },
+        height: { ideal: 720 }
+      },
+      audio: false
+    })
+    .then(function(stream) {
+      nativeVideo.srcObject = stream;
+      nativeVideo.play();
+      nativeVideo.onloadedmetadata = function() {
+        videoReady = true;
+      };
+    })
+    .catch(function(err) {
+      console.warn('Camera error:', err);
+      videoReady = false;
+    });
+  } else {
+    console.warn('getUserMedia not supported on this browser.');
+  }
 
   spawnBugs();
 }
@@ -100,21 +106,22 @@ function drawCounter() {
   push();
   textFont(customFont);
   textAlign(CENTER, TOP);
-  textSize(80); // Reduced from 175 — more readable on mobile
+  textSize(80);
   fill(255);
   text(`${defeatedCount}/${totalBugs}`, width / 2, 20);
   pop();
 }
 
 /* ===============================
-   Camera: object-fit cover
+   Camera: draw native video element cover-fit onto canvas
 =============================== */
 function drawCameraCover() {
-  // Bail out if camera isn't ready or has no dimensions yet
-  if (!video || !videoReady || video.width === 0 || video.height === 0) return;
+  if (!videoReady || !nativeVideo || nativeVideo.readyState < 2) return;
 
-  let camW = video.width;
-  let camH = video.height;
+  let camW = nativeVideo.videoWidth;
+  let camH = nativeVideo.videoHeight;
+  if (camW === 0 || camH === 0) return;
+
   let canvasW = width;
   let canvasH = height;
   let camRatio = camW / camH;
@@ -124,29 +131,20 @@ function drawCameraCover() {
 
   if (camRatio > canvasRatio) {
     // Camera is wider — crop sides
-    visibleWidth = canvasW;
-    visibleHeight = canvasH;
-    visibleX = 0;
-    visibleY = 0;
-
     sh = camH;
     sw = camH * canvasRatio;
     sx = (camW - sw) / 2;
     sy = 0;
   } else {
     // Camera is taller — crop top/bottom
-    visibleWidth = canvasW;
-    visibleHeight = canvasH;
-    visibleX = 0;
-    visibleY = 0;
-
     sw = camW;
     sh = camW / canvasRatio;
     sx = 0;
     sy = (camH - sh) / 2;
   }
 
-  image(video, 0, 0, canvasW, canvasH, sx, sy, sw, sh);
+  // Draw the native video element directly onto the p5 canvas
+  drawingContext.drawImage(nativeVideo, sx, sy, sw, sh, 0, 0, canvasW, canvasH);
 }
 
 /* ===============================
@@ -154,7 +152,6 @@ function drawCameraCover() {
 =============================== */
 function spawnBugs() {
   for (let i = 0; i < totalBugs; i++) {
-    // Use Math.random() instead of p5's random() inside setTimeout
     let delay = i * (Math.random() * (SPAWN_DELAY_MAX - SPAWN_DELAY_MIN) + SPAWN_DELAY_MIN);
     setTimeout(() => {
       bugs.push(new Bug(bugImages[i]));
@@ -163,10 +160,12 @@ function spawnBugs() {
 }
 
 /* ===============================
-   Touch/Click handler
+   Touch/Click handlers
 =============================== */
 function touchStarted() {
-  handleInteraction(touches.length > 0 ? touches[0].x : mouseX, touches.length > 0 ? touches[0].y : mouseY);
+  let px = touches.length > 0 ? touches[0].x : mouseX;
+  let py = touches.length > 0 ? touches[0].y : mouseY;
+  handleInteraction(px, py);
   return false;
 }
 
@@ -185,7 +184,7 @@ function handleInteraction(px, py) {
   }
 
   if (defeatedCount === totalBugs) {
-    window.location.href = "end.html";
+    window.location.href = 'end.html';
   }
 }
 
@@ -206,7 +205,6 @@ class Bug {
     this.startY = 0;
     this.rotation = 0;
 
-    // Convert seconds to frames at ~60fps
     this.moveDuration = (Math.random() * (BUG_MOVE_DURATION_MAX - BUG_MOVE_DURATION_MIN) + BUG_MOVE_DURATION_MIN) * 60;
     this.moveProgress = 0;
 
