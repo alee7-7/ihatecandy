@@ -16,7 +16,7 @@ const BUG_MOVE_DURATION_MAX = 8;
 
 // Bug size as a fraction of screen width (0.08 = 8% of screen width)
 const BUG_SIZE_MIN_FRAC = 0.30;
-const BUG_SIZE_MAX_FRAC = 0.50;
+const BUG_SIZE_MAX_FRAC = 0.80;
 
 const FADE_SPEED = 3;
 const MARGIN_TOP = 0;
