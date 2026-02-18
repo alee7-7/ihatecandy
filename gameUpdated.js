@@ -20,8 +20,8 @@ const SPAWN_DELAY_MAX = 2000;
 const BUG_MOVE_DURATION_MIN = 3;
 const BUG_MOVE_DURATION_MAX = 8;
 
-const BUG_SIZE_MIN = 80;
-const BUG_SIZE_MAX = 150;
+const BUG_SIZE_MIN = 60;
+const BUG_SIZE_MAX = 100;
 
 const FADE_SPEED = 3;
 
@@ -42,6 +42,7 @@ function preload() {
 }
 
 function setup() {
+  pixelDensity(1); // Prevent size doubling on high-DPI/Retina screens
   let cnv = createCanvas(windowWidth, windowHeight);
   cnv.parent(document.body);
   cnv.style('display', 'block');
@@ -106,7 +107,7 @@ function drawCounter() {
   push();
   textFont(customFont);
   textAlign(CENTER, TOP);
-  textSize(80);
+  textSize(40);
   fill(255);
   text(`${defeatedCount}/${totalBugs}`, width / 2, 20);
   pop();
